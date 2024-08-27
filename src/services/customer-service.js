@@ -92,8 +92,8 @@ class CustomerService {
     }
 
     async deleteToWishList(customerId, product) {
-        await this.repository.deleteToWishListItem(customerId, product)
-
+        const userdata = await this.repository.deleteToWishListItem(customerId, product)
+        return FormateData(userdata)
     }
 
 }

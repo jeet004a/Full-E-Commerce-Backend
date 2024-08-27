@@ -1,4 +1,6 @@
 const { CustomerModel, AddressModel } = require("../models");
+const mongoose = require('mongoose');
+const { ObjectId } = mongoose.Types;
 
 class CustomerRepository {
     async CreateCustomer({ email, password, phone, salt }) {
@@ -92,9 +94,16 @@ class CustomerRepository {
 
 
     async deleteToWishListItem(customerId, product) {
-        const userProfile = await CustomerModel.findById(customerId).populate("wishlist")
-            // console.log(product)
-        console.log(userProfile)
+        const userProfile = await CustomerModel.findById(customerId)
+            // console.log(userProfile.wishlist)
+        const index = userProfile.wishlist.indexOf(product.data._id.toString())
+        if (index > -1) {
+            userProfile.wishlist.splice(index, 1) //
+        } else {
+            return "Item is not present into your wishlist"
+        }
+        const data = await userProfile.save()
+        return data
     }
 }
 
