@@ -3,9 +3,9 @@ const { FormateData, GenerateSalt, GeneratePassword, GenerateSignature, validate
 
 class CustomerService {
     constructor() {
-        this.repository = new CustomerRepository();
-    } 
-
+            this.repository = new CustomerRepository();
+        }
+        //This is sign in service
     async SignUp(userInputs) {
         try {
             const { email, password, phone } = userInputs;
