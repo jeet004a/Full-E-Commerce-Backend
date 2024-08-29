@@ -96,6 +96,17 @@ class CustomerService {
         return FormateData(userdata)
     }
 
+    async addToCart(userId, product, qty) {
+        const data = await this.repository.addToCartItem(userId, product, qty)
+        return FormateData(data)
+    }
+
+    async deleteToCart(customerId, productId) {
+        const userData = await this.repository.deleteToCartItem(customerId, productId)
+        return FormateData(userData)
+
+    }
+
 }
 
 

@@ -55,8 +55,8 @@ class CustomerRepository {
             const existingCustomer = await CustomerModel.findById({ _id })
                 .populate('address')
                 // .populate('wishlist')
-                // .populate('orders')
-                // .populate('cart')
+                .populate('orders')
+                .populate('cart')
             return existingCustomer
         } catch (error) {
 
@@ -90,9 +90,6 @@ class CustomerRepository {
 
     }
 
-
-
-
     async deleteToWishListItem(customerId, product) {
         const userProfile = await CustomerModel.findById(customerId)
             // console.log(userProfile.wishlist)
@@ -105,6 +102,86 @@ class CustomerRepository {
         const data = await userProfile.save()
         return data
     }
+
+    async addToCartItem(userId, product, qty) {
+        try {
+            const userProfile = await CustomerModel.findById(userId).populate('cart')
+            if (userProfile) {
+                const cartItem = {
+                    product,
+                    unit: qty
+                }
+
+                let cartItems = userProfile.cart
+                let counter = 0
+                let index = 0
+                for (let i = 0; i < cartItems.length; i++) {
+                    if (userProfile.cart[i].product.toString() === product.data._id.toString()) {
+                        counter = counter + 1
+                        index = i
+                    }
+                }
+                if (counter > 0) {
+                    userProfile.cart[index].unit = userProfile.cart[index].unit + 1
+                    const data = await userProfile.save()
+                    return data
+                } else {
+                    cartItem.product = product.data._id.toString()
+                        // cartItem.unit = 1
+                    await userProfile.cart.push(cartItem)
+                    const data = await userProfile.save()
+                    return data
+                }
+
+                // console.log(userProfile.cart[0].product.toString())
+
+
+            }
+        } catch (error) {
+            console.log(error)
+        }
+
+    }
+
+
+    // userProfile.cart[i].product.toString()
+
+    async deleteToCartItem(customerId, productId) {
+        try {
+            const userProfile = await CustomerModel.findById(customerId).populate('cart')
+            let flag
+            if (userProfile) {
+                for (let i = 0; i < userProfile.cart.length; i++) {
+                    if (userProfile.cart[i].product.toString() === productId.toString()) {
+                        if (userProfile.cart[i].unit > 1) {
+                            userProfile.cart[i].unit = userProfile.cart[i].unit - 1
+                            const data = await userProfile.save()
+                            return data
+                        } else if (userProfile.cart[i].unit === 1) {
+                            userProfile.cart.splice(1, 1)
+                            const data = await userProfile.save()
+                            return data
+                                // console.log(userProfile)
+                        } else {
+                            return "Data Not Found"
+                        }
+                    } else {
+                        flag = "Data not found"
+                    }
+                }
+                return flag
+            }
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+
+
+
+
+
+
 }
-//hello
+
 module.exports = CustomerRepository
