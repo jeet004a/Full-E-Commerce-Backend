@@ -94,20 +94,20 @@ module.exports = (app) => {
         }
     })
 
-    app.put('/cart', UserAuth, async(req, res) => {
-        try {
-            const { _id, qty } = req.body
-            const userId = req.user._id
-                // console.log(userId)
-            const product = await service.GetProductById(_id)
-            const userCurrentData = await customerService.addToCart(userId, product, 1)
-            return res.status(200).json({ "Cart Updated": userCurrentData })
-        } catch (error) {
-            next(error)
-        }
-    })
+    // app.put('/cart', UserAuth, async(req, res) => {
+    //     try {
+    //         const { _id, qty } = req.body
+    //         const userId = req.user._id
+    //             // console.log(userId)
+    //         const product = await service.GetProductById(_id)
+    //         const userCurrentData = await customerService.addToCart(userId, product, 1)
+    //         return res.status(200).json({ "Cart Updated": userCurrentData })
+    //     } catch (error) {
+    //         next(error)
+    //     }
+    // })
 
-
+    //Delete item from cart
     app.delete('/cart/:id', UserAuth, async(req, res) => {
         try {
             // console.log(req.user)

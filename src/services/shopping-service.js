@@ -1,5 +1,5 @@
 const { ShoppingRepository } = require('../database')
-
+const { FormateData } = require('../utils')
 class ShoppingService {
     constructor() {
         this.repository = new ShoppingRepository()
@@ -17,6 +17,8 @@ class ShoppingService {
         const { _id, txnNumber } = userInputs
 
         const orderResult = await this.repository.CreateNewOrder(_id, txnNumber)
+            // await this.repository.CreateNewOrder(_id, txnNumber)
+        return FormateData(orderResult)
     }
 }
 

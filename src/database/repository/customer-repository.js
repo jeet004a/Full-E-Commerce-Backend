@@ -54,7 +54,7 @@ class CustomerRepository {
         try {
             const existingCustomer = await CustomerModel.findById({ _id })
                 .populate('address')
-                // .populate('wishlist')
+                .populate('wishlist')
                 .populate('orders')
                 .populate('cart')
             return existingCustomer
