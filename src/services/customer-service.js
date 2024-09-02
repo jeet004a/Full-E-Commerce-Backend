@@ -1,5 +1,6 @@
 const { CustomerRepository, ProductRepository } = require("../database");
 const { FormateData, GenerateSalt, GeneratePassword, GenerateSignature, validatePassword } = require('../utils')
+const { APIError, NotFoundError, AppError } = require('../utils/app-errors')
 
 class CustomerService {
     constructor() {
@@ -17,12 +18,16 @@ class CustomerService {
             const token = await GenerateSignature({ email: email, _id: existingCustomer._id })
 
 
-            return FormateData({ id: existingCustomer._id, token })
+            if (token) {
+                return FormateData({ id: existingCustomer._id, token })
+            }
+            return FormateData(null)
 
             // return FormateData({ 'User Email': userPassword })
 
-        } catch (err) {
-            throw new APIError('Data Not found', err)
+        } catch (error) {
+            throw new APIError('Data Not found', error)
+
         }
 
     }
@@ -33,6 +38,8 @@ class CustomerService {
 
             const existingCustomer = await this.repository.FindCustomer({ email })
 
+            // if (!existingCustomer) throw new APIError("User email id is not found");
+
             if (existingCustomer) {
                 const validPassword = await validatePassword(password, existingCustomer.password, existingCustomer.salt)
                 if (validatePassword) {
@@ -40,11 +47,28 @@ class CustomerService {
                     return FormateData({ _id: existingCustomer._id, token })
                 }
             }
+            return FormateData(null)
 
-        } catch (error) {
-            throw new APIError("Error while loginin from customer-service", error);
-
+        } catch (err) {
+            // console.log(err.statusCode)
+            throw new APIError('Data Not found', err)
         }
+
+        //Sample Error Handel
+        //     const { email, password } = userInputs
+
+        //     const existingCustomer = await this.repository.FindCustomer({ email })
+
+        //     if (!existingCustomer) throw new APIError("User email id is not found");
+
+
+        //     if (existingCustomer) {
+        //         const validPassword = await validatePassword(password, existingCustomer.password, existingCustomer.salt)
+        //         if (validatePassword) {
+        //             const token = await GenerateSignature({ email: existingCustomer.email, _id: existingCustomer._id })
+        //             return FormateData({ _id: existingCustomer._id, token })
+        //         }
+        //     }
     }
 
     async AddNewAddress(_id, userInputs) {
@@ -54,9 +78,12 @@ class CustomerService {
 
             const addressResult = await this.repository.CreateAddress(_id, { street, postalcode, city, country })
 
-            return FormateData(addressResult)
+            if (addressResult) {
+                return FormateData(addressResult)
+            }
+            return FormateData(null)
         } catch (error) {
-            throw new APIError('Data Not Found', error)
+            throw new APIError('Address Not Added', err)
         }
     }
 
@@ -85,15 +112,23 @@ class CustomerService {
 
 
     async AddToWishList(customerId, product) {
-        const userdata = await this.repository.AddWishlistItem(customerId, product)
-            // await this.repository.AddWishlistItem(customerId, product)
-            // console.log(userdata)
-        return FormateData(userdata)
+        try {
+            const userdata = await this.repository.AddWishlistItem(customerId, product)
+                // await this.repository.AddWishlistItem(customerId, product)
+                // console.log(userdata)
+            return FormateData(userdata)
+        } catch (error) {
+            throw new APIError('Data Not Found', error);
+        }
     }
 
     async deleteToWishList(customerId, product) {
-        const userdata = await this.repository.deleteToWishListItem(customerId, product)
-        return FormateData(userdata)
+        try {
+            const userdata = await this.repository.deleteToWishListItem(customerId, product)
+            return FormateData(userdata)
+        } catch (error) {
+            throw new APIError('Data Not Found', error);
+        }
     }
 
     async addToCart(userId, product, qty) {

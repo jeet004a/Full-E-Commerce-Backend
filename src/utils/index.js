@@ -16,6 +16,7 @@ module.exports.GeneratePassword = async(password, salt) => {
 
 module.exports.GenerateSignature = async(payload) => {
     try {
+        //Print User Eamil And ObjectId to console log
         console.log(payload)
         return jwt.sign(payload, APP_SECRET, { expiresIn: "2d" })
     } catch (error) {

@@ -1,5 +1,6 @@
 const { ProductRepository } = require('../database')
 const { FormateData } = require('../utils')
+const { APIError, NotFoundError, AppError } = require('../utils/app-errors')
 
 class ProductService {
     constructor() {
@@ -11,7 +12,7 @@ class ProductService {
             const productResult = await this.repository.CreateProduct(productInputs)
             return FormateData(productResult)
         } catch (error) {
-            console.log(error)
+            throw new APIError('Data Not found')
         }
     }
 
@@ -20,7 +21,7 @@ class ProductService {
             const result = await this.repository.productByType(productInputs)
             return FormateData(result)
         } catch (error) {
-            console.log(error)
+            throw new APIError('Data Not found')
         }
     }
 
@@ -34,7 +35,7 @@ class ProductService {
 
             return FormateData({ products, categories })
         } catch (error) {
-            console.log(error)
+            throw new APIError('Data Not found')
         }
     }
 
@@ -43,7 +44,7 @@ class ProductService {
             const data = await this.repository.FindById(productId)
             return FormateData(data)
         } catch (error) {
-            console.log(error)
+            throw new APIError('Data Not found')
         }
     }
 
@@ -52,7 +53,7 @@ class ProductService {
             const data = await this.repository.FindById(productId)
             return FormateData(data)
         } catch (error) {
-            console.log(error)
+            throw new APIError('Data Not found')
         }
     }
 

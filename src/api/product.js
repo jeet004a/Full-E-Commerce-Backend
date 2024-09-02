@@ -2,6 +2,7 @@ const UserAuth = require('./middlewares/auth')
 
 const ProductService = require('../services/product-service')
 const CustomerService = require('../services/customer-service')
+const AppLogs = require('../utils/api-request')
 
 module.exports = (app) => {
     const service = new ProductService()
@@ -9,7 +10,7 @@ module.exports = (app) => {
 
 
     //Create Products
-    app.post('/product/create', async(req, res, next) => {
+    app.post('/product/create', UserAuth, AppLogs, async(req, res, next) => {
             try {
                 const { name, desc, banner, type, unit, price, available, supplier } = req.body
                 const { data } = await service.CreateProduct({ name, desc, banner, type, unit, price, available, supplier })
@@ -19,8 +20,9 @@ module.exports = (app) => {
             }
         })
         //Get All product By Ids
-    app.get('/category/:type', async(req, res, next) => {
+    app.get('/category/:type', UserAuth, AppLogs, async(req, res, next) => {
         try {
+            // await AppLogs(req)
             const { data } = await service.ProductByType(req.params.type)
             return res.json(data)
         } catch (error) {
@@ -29,7 +31,7 @@ module.exports = (app) => {
     })
 
     //Get All Products
-    app.get('/', async(req, res, next) => {
+    app.get('/', UserAuth, AppLogs, async(req, res, next) => {
         try {
             // const { data } = await service.GetProducts()
             const data = await service.GetProducts()
@@ -40,7 +42,7 @@ module.exports = (app) => {
     })
 
 
-    app.get('/:id', async(req, res, next) => {
+    app.get('/:id', UserAuth, AppLogs, async(req, res, next) => {
         try {
             const { data } = await service.GetProductDescription(req.params.id)
             return res.status(200).json(data)
@@ -50,7 +52,7 @@ module.exports = (app) => {
     });
 
     //Add a Item to wishlist
-    app.put('/wishlist', UserAuth, async(req, res, next) => {
+    app.put('/wishlist', UserAuth, AppLogs, async(req, res, next) => {
         try {
             const { _id } = req.user
             const product = await service.GetProductById(req.body._id)
@@ -64,7 +66,7 @@ module.exports = (app) => {
     })
 
     //Remove a Item to wishlist
-    app.delete('/wishlist/:id', UserAuth, async(req, res, next) => {
+    app.delete('/wishlist/:id', UserAuth, AppLogs, async(req, res, next) => {
         try {
             const { _id } = req.user
             const productId = req.params.id;
@@ -81,7 +83,7 @@ module.exports = (app) => {
     });
 
     //Added a item to cart
-    app.put('/cart', UserAuth, async(req, res) => {
+    app.put('/cart', UserAuth, AppLogs, async(req, res) => {
         try {
             const { _id, qty } = req.body
             const userId = req.user._id
@@ -108,7 +110,7 @@ module.exports = (app) => {
     // })
 
     //Delete item from cart
-    app.delete('/cart/:id', UserAuth, async(req, res) => {
+    app.delete('/cart/:id', UserAuth, AppLogs, async(req, res) => {
         try {
             // console.log(req.user)
             const product = await service.GetProductById(req.params.id)
